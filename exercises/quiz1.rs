@@ -13,10 +13,18 @@
 //
 // No hints this time ;)
 
-// I AM NOT DONE
 
 // Put your function here!
-// fn calculate_price_of_apples {
+fn calculate_price_of_apples(amount: usize) -> usize {
+    const COST_OF_APPLE_BEFORE_DISCOUNT: usize = 2;
+    const COST_OF_APPLE_AFTER_DISCOUNT: usize = 1;
+    const DISCOUNT_THRESHOLD: usize = 40;
+    if amount <= DISCOUNT_THRESHOLD {
+        amount * COST_OF_APPLE_BEFORE_DISCOUNT
+    } else {
+        amount * COST_OF_APPLE_AFTER_DISCOUNT
+    }
+}
 
 // Don't modify this function!
 #[test]
