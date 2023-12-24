@@ -50,24 +50,61 @@ enum ParsePersonError {
 impl FromStr for Person {
     type Err = ParsePersonError;
     fn from_str(s: &str) -> Result<Person, Self::Err> {
-        if s.is_empty() {
-            return Err(ParsePersonError::Empty);
-        }
-        if let [name, age] = s.split(",").collect::<Vec<&str>>().as_slice() {
-            if name.is_empty() {
-                return Err(ParsePersonError::NoName);
-            }
-            let parsed_age = age
-                .parse::<usize>()
-                .map_err(|e| ParsePersonError::ParseInt(e))?;
-            return Ok(Person {
-                name: name.to_string(),
-                age: parsed_age,
-            });
-        }
-        Err(ParsePersonError::BadLen)
+        check_for_empty_string(s)?;
+        let (name, age) = split_string_to_name_and_age(s)?;
+        let name = parse_name(name)?;
+        let age = parse_age(age)?;
+        Ok(Person { name, age })
     }
 }
+
+fn split_string_to_name_and_age(s: &str) -> Result<(&str, &str), ParsePersonError> {
+    let mut parts = s.split(",");
+    let (Some(name), Some(age), None) = (parts.next(), parts.next(), parts.next()) else {
+        return Err(ParsePersonError::BadLen);
+    };
+    Ok((name, age))
+}
+
+fn check_for_empty_string(s: &str) -> Result<(), ParsePersonError> {
+    if s.is_empty() {
+        return Err(ParsePersonError::Empty);
+    }
+    Ok(())
+}
+
+fn parse_name(name: &str) -> Result<String, ParsePersonError> {
+    if name.is_empty() {
+        return Err(ParsePersonError::NoName);
+    }
+    Ok(name.to_string())
+}
+
+fn parse_age(age: &str) -> Result<usize, ParsePersonError> {
+    age.parse::<usize>().map_err(ParsePersonError::ParseInt)
+}
+
+// impl FromStr for Person {
+//     type Err = ParsePersonError;
+//     fn from_str(s: &str) -> Result<Person, Self::Err> {
+//         if s.is_empty() {
+//             return Err(ParsePersonError::Empty);
+//         }
+//         if let [name, age] = s.split(",").collect::<Vec<&str>>().as_slice() {
+//             if name.is_empty() {
+//                 return Err(ParsePersonError::NoName);
+//             }
+//             let parsed_age = age
+//                 .parse::<usize>()
+//                 .map_err(|e| ParsePersonError::ParseInt(e))?;
+//             return Ok(Person {
+//                 name: name.to_string(),
+//                 age: parsed_age,
+//             });
+//         }
+//         Err(ParsePersonError::BadLen)
+//     }
+// }
 
 fn main() {
     let p = "Mark,20".parse::<Person>().unwrap();
